@@ -13,7 +13,7 @@ app.get('/health', (_req, res) => {
 	return res.status(200).json({ status: 'ok' });
 });
 
-app.use('/api/auth', authRouter);
+app.use('/api/v1/auth', authRouter);
 app.use(errorMiddleware);
 
 export { app };

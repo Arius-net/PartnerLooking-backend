@@ -6,6 +6,7 @@ export interface UserRecord {
   email: string;
   password_hash: string;
   is_verified: boolean;
+  rol: string;
 }
 
 export interface CreateUserInput {
@@ -18,7 +19,7 @@ const createUser = async (input: CreateUserInput): Promise<UserRecord> => {
   const sql = `
     INSERT INTO usuarios (nombre_completo, email, password_hash)
     VALUES ($1, $2, $3)
-    RETURNING id, nombre_completo, email, password_hash, is_verified
+    RETURNING id, nombre_completo, email, password_hash, is_verified, rol
   `;
 
   const user = await queryOne<UserRecord>(sql, [
@@ -34,9 +35,9 @@ const createUser = async (input: CreateUserInput): Promise<UserRecord> => {
   return user;
 };
 
-const findUserByEmail = async (email: string): Promise<UserRecord | null> => {
+const findByEmail = async (email: string): Promise<UserRecord | null> => {
   const sql = `
-    SELECT id, nombre_completo, email, password_hash, is_verified
+    SELECT id, nombre_completo, email, password_hash, is_verified, rol
     FROM usuarios
     WHERE email = $1
     LIMIT 1
@@ -45,4 +46,4 @@ const findUserByEmail = async (email: string): Promise<UserRecord | null> => {
   return queryOne<UserRecord>(sql, [email]);
 };
 
-export { createUser, findUserByEmail };
+export { createUser, findByEmail };

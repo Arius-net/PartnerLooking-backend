@@ -1,7 +1,7 @@
 import { compare, hash } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import type { SignOptions } from 'jsonwebtoken';
-import { createUser, findUserByEmail } from './repository';
+import { createUser, findByEmail } from './repository';
 
 export interface RegisterInput {
   nombreCompleto: string;
@@ -19,6 +19,7 @@ export interface AuthUser {
   nombreCompleto: string;
   email: string;
   isVerified: boolean;
+  rol: string;
 }
 
 export interface LoginResult {
@@ -28,6 +29,7 @@ export interface LoginResult {
 
 interface JwtPayload {
   id: string;
+  rol: string;
   is_verified: boolean;
 }
 
@@ -67,17 +69,19 @@ const toAuthUser = (user: {
   nombre_completo: string;
   email: string;
   is_verified: boolean;
+  rol: string;
 }): AuthUser => ({
   id: user.id,
   nombreCompleto: user.nombre_completo,
   email: user.email,
   isVerified: user.is_verified,
+  rol: user.rol,
 });
 
 const register = async (input: RegisterInput): Promise<AuthUser> => {
   const normalizedEmail = input.email.trim().toLowerCase();
 
-  const existingUser = await findUserByEmail(normalizedEmail);
+  const existingUser = await findByEmail(normalizedEmail);
   if (existingUser) {
     throw new AuthServiceError('El email ya esta registrado.', 400);
   }
@@ -96,7 +100,7 @@ const register = async (input: RegisterInput): Promise<AuthUser> => {
 const login = async (input: LoginInput): Promise<LoginResult> => {
   const normalizedEmail = input.email.trim().toLowerCase();
 
-  const user = await findUserByEmail(normalizedEmail);
+  const user = await findByEmail(normalizedEmail);
   if (!user) {
     throw new AuthServiceError('Credenciales invalidas.', 401);
   }
@@ -108,6 +112,7 @@ const login = async (input: LoginInput): Promise<LoginResult> => {
 
   const payload: JwtPayload = {
     id: user.id,
+    rol: user.rol,
     is_verified: user.is_verified,
   };
 
