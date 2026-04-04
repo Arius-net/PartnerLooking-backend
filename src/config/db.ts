@@ -1,79 +1,37 @@
-import { Pool, PoolConfig } from 'pg';
+import { Pool, type QueryResultRow } from 'pg';
 
-/**
- * Configuración del pool de conexiones para PostgreSQL
- * Usa la variable de entorno DATABASE_URL
- */
+const databaseUrl = process.env.DATABASE_URL;
 
-let pool: Pool;
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL no esta definida en variables de entorno.');
+}
 
-const initializeDatabase = (): Pool => {
-  const databaseUrl = process.env.DATABASE_URL;
+const pool = new Pool({
+  connectionString: databaseUrl,
+});
 
-  if (!databaseUrl) {
-    throw new Error(
-      'DATABASE_URL no definida. Configure la variable de entorno con el formato: postgresql://usuario:password@host:puerto/base_datos'
-    );
-  }
+pool.on('error', (error: Error) => {
+  console.error('Unexpected PostgreSQL pool error:', error);
+});
 
-  const poolConfig: PoolConfig = {
-    connectionString: databaseUrl,
-    max: 20, // Máximo de conexiones simultáneas
-    idleTimeoutMillis: 30000, // Timeout de inactividad
-    connectionTimeoutMillis: 5000, // Timeout de conexión
-  };
-
-  pool = new Pool(poolConfig);
-
-  // Manejo de errores del pool
-  pool.on('error', (err) => {
-    console.error('Error inesperado en el pool de PostgreSQL:', err);
-  });
-
-  return pool;
+const query = async <T extends QueryResultRow>(
+  queryText: string,
+  params: unknown[] = []
+): Promise<T[]> => {
+  const result = await pool.query<T>(queryText, params);
+  return result.rows;
 };
 
-const getPool = (): Pool => {
-  if (!pool) {
-    throw new Error(
-      'El pool de base de datos no ha sido inicializado. Llama a initializeDatabase() primero.'
-    );
-  }
-  return pool;
+const queryOne = async <T extends QueryResultRow>(
+  queryText: string,
+  params: unknown[] = []
+): Promise<T | null> => {
+  const rows = await query<T>(queryText, params);
+  return rows[0] ?? null;
 };
 
-/**
- * Ejecuta una consulta en la base de datos
- * @param query - Consulta SQL
- * @param params - Parámetros de la consulta (para prevenir SQL injection)
- */
-const query = async <T = any>(queryText: string, params?: any[]): Promise<T[]> => {
-  const pool = getPool();
-  try {
-    const result = await pool.query(queryText, params);
-    return result.rows;
-  } catch (error) {
-    console.error('Error en consulta SQL:', queryText, error);
-    throw error;
-  }
-};
-
-/**
- * Ejecuta una consulta que devuelve una sola fila
- */
-const queryOne = async <T = any>(queryText: string, params?: any[]): Promise<T | null> => {
-  const results = await query<T>(queryText, params);
-  return results[0] ?? null;
-};
-
-/**
- * Cierra la conexión del pool
- */
 const closeDatabase = async (): Promise<void> => {
-  if (pool) {
-    await pool.end();
-    console.log('Conexión a PostgreSQL cerrada.');
-  }
+  await pool.end();
 };
 
-export { initializeDatabase, getPool, query, queryOne, closeDatabase };
+export { pool, query, queryOne, closeDatabase };

@@ -1,12 +1,10 @@
 import 'dotenv/config';
 import { app } from './app';
-import { closeDatabase, initializeDatabase } from './config/db';
+import { closeDatabase } from './config/db';
 
 const port = Number.parseInt(process.env.PORT ?? '3000', 10);
 
 const startServer = async (): Promise<void> => {
-	initializeDatabase();
-
 	app.listen(port, () => {
 		console.log(`Server running on port ${port}`);
 	});

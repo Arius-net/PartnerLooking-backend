@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express, { type Application } from 'express';
 import { authRouter } from './auth/routes';
+import { errorMiddleware } from './middlewares/error.middleware';
 
 const app: Application = express();
 
@@ -13,5 +14,6 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRouter);
+app.use(errorMiddleware);
 
 export { app };
