@@ -63,7 +63,7 @@ const query = async <T = any>(queryText: string, params?: any[]): Promise<T[]> =
  */
 const queryOne = async <T = any>(queryText: string, params?: any[]): Promise<T | null> => {
   const results = await query<T>(queryText, params);
-  return results.length > 0 ? results[0] : null;
+  return results[0] ?? null;
 };
 
 /**

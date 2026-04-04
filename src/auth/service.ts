@@ -1,5 +1,6 @@
 import { compare, hash } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
 import { createUser, findUserByEmail } from './repository';
 
 export interface RegisterInput {
@@ -110,9 +111,11 @@ const login = async (input: LoginInput): Promise<LoginResult> => {
     is_verified: user.is_verified,
   };
 
-  const token = sign(payload, getJwtSecret(), {
-    expiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
-  });
+  const expiresIn = (process.env.JWT_EXPIRES_IN ?? '7d') as NonNullable<
+    SignOptions['expiresIn']
+  >;
+
+  const token = sign(payload, getJwtSecret(), { expiresIn });
 
   return {
     token,
