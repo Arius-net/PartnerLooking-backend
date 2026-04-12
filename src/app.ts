@@ -5,6 +5,8 @@ import { errorMiddleware } from './middlewares/error.middleware';
 import { validationsRouter } from './validations/routes';
 import { listingsRouter } from './listings/routes';
 import { usersRouter } from './users/routes';
+import { favoritesRouter } from './favorites/routes';
+import { reviewsRouter } from './reviews/routes';
 
 const app: Application = express();
 
@@ -20,6 +22,8 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/validations', validationsRouter);
 app.use('/api/v1/listings', listingsRouter);
 app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/favorites', favoritesRouter);
+app.use('/api/v1/reviews', reviewsRouter);
 app.use(errorMiddleware);
 
 export { app };
