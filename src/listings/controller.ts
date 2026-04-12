@@ -1,6 +1,11 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { AuthenticatedRequest } from '../middlewares/auth.middleware';
-import { ListingsServiceError, createNewListing, fetchAllListings } from './service';
+import {
+  ListingsServiceError,
+  createNewListing,
+  fetchAllListings,
+  fetchNearbyListings,
+} from './service';
 import type { CreateListingInput } from './repository';
 
 interface CreateListingRequestBody {
@@ -25,6 +30,14 @@ interface CreateListingRequestBody {
 interface ListingsQuery {
   tipo?: string;
   ciudad?: string;
+  limite?: string;
+  offset?: string;
+}
+
+interface NearbyListingsQuery {
+  latitud?: string;
+  longitud?: string;
+  radio_km?: string;
   limite?: string;
   offset?: string;
 }
@@ -165,4 +178,52 @@ const createListingController = async (
   }
 };
 
-export { getAllListingsController, createListingController };
+const getNearbyListingsController = async (
+  req: Request<unknown, unknown, unknown, NearbyListingsQuery>,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const latitud = req.query.latitud ? Number.parseFloat(req.query.latitud) : NaN;
+    const longitud = req.query.longitud ? Number.parseFloat(req.query.longitud) : NaN;
+    const radio_km = req.query.radio_km ? Number.parseFloat(req.query.radio_km) : NaN;
+    const limite = req.query.limite ? Number.parseInt(req.query.limite, 10) : 20;
+    const offset = req.query.offset ? Number.parseInt(req.query.offset, 10) : 0;
+
+    if (
+      Number.isNaN(latitud)
+      || Number.isNaN(longitud)
+      || Number.isNaN(radio_km)
+    ) {
+      return res.status(400).json({
+        message: 'latitud, longitud y radio_km son obligatorios y deben ser numéricos.',
+      });
+    }
+
+    const listings = await fetchNearbyListings({
+      latitud,
+      longitud,
+      radio_km,
+      limite,
+      offset,
+    });
+
+    return res.status(200).json({
+      message: 'Publicaciones cercanas obtenidas correctamente.',
+      listings,
+      pagination: {
+        limite,
+        offset,
+        total: listings.length,
+      },
+    });
+  } catch (error: unknown) {
+    if (error instanceof ListingsServiceError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+
+    return next(error);
+  }
+};
+
+export { getAllListingsController, createListingController, getNearbyListingsController };

@@ -104,6 +104,18 @@ interface ListingsFilter {
   offset?: number;
 }
 
+export interface NearbyListingsFilter {
+  latitud: number;
+  longitud: number;
+  radio_km: number;
+  limite?: number;
+  offset?: number;
+}
+
+export interface NearbyListingRecord extends ListingRecord {
+  distancia_km: string;
+}
+
 const getAllListings = async (filter: ListingsFilter = {}): Promise<ListingRecord[]> => {
   const limite = filter.limite ?? 20;
   const offset = filter.offset ?? 0;
@@ -135,4 +147,59 @@ const getAllListings = async (filter: ListingsFilter = {}): Promise<ListingRecor
   return query<ListingRecord>(sql, params);
 };
 
-export { createListing, getAllListings };
+const getNearbyListings = async (filter: NearbyListingsFilter): Promise<NearbyListingRecord[]> => {
+  const limite = filter.limite ?? 20;
+  const offset = filter.offset ?? 0;
+
+  const sql = `
+    SELECT
+      id,
+      autor_id,
+      tipo_publicacion,
+      tipo_espacio,
+      titulo,
+      descripcion,
+      direccion,
+      ciudad,
+      colonia,
+      precio,
+      disponible_desde,
+      numero_roommates,
+      latitud,
+      longitud,
+      amenidades,
+      permite_mascotas,
+      permite_fumar,
+      permite_visitas,
+      estado,
+      vistas,
+      created_at,
+      updated_at,
+      (
+        6371 * acos(
+          cos(radians($1)) * cos(radians(latitud)) * cos(radians(longitud) - radians($2))
+          + sin(radians($1)) * sin(radians(latitud))
+        )
+      ) AS distancia_km
+    FROM publicaciones
+    WHERE estado = 'Activa'
+    AND (
+      6371 * acos(
+        cos(radians($1)) * cos(radians(latitud)) * cos(radians(longitud) - radians($2))
+        + sin(radians($1)) * sin(radians(latitud))
+      )
+    ) <= $3
+    ORDER BY distancia_km ASC
+    LIMIT $4 OFFSET $5
+  `;
+
+  return query<NearbyListingRecord>(sql, [
+    filter.latitud,
+    filter.longitud,
+    filter.radio_km,
+    limite,
+    offset,
+  ]);
+};
+
+export { createListing, getAllListings, getNearbyListings };

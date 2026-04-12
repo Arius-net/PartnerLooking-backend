@@ -99,4 +99,22 @@ const deleteMyAccount = async (userId: string): Promise<{ message: string }> => 
   return { message: 'Cuenta eliminada exitosamente.' };
 };
 
-export { getPublicProfile, updateMyProfile, changePassword, deleteMyAccount };
+// Obtener telefono de contacto solo para usuarios verificados
+const getVerifiedContact = async (
+  targetUserId: string,
+  requesterIsVerified: boolean
+): Promise<{ telefono: string | null }> => {
+  if (requesterIsVerified !== true) {
+    throw new UserServiceError('Debes estar verificado para ver el contacto.', 403);
+  }
+
+  const user = await getUserById(targetUserId);
+
+  if (!user) {
+    throw new UserServiceError('Usuario no encontrado.', 404);
+  }
+
+  return { telefono: user.telefono };
+};
+
+export { getPublicProfile, updateMyProfile, changePassword, deleteMyAccount, getVerifiedContact };

@@ -1,5 +1,12 @@
 import type { Response } from 'express';
-import { getPublicProfile, updateMyProfile, changePassword, deleteMyAccount, UserServiceError } from './service';
+import {
+  getPublicProfile,
+  updateMyProfile,
+  changePassword,
+  deleteMyAccount,
+  getVerifiedContact,
+  UserServiceError,
+} from './service';
 import type { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import type { UpdateProfileInput } from './repository';
 
@@ -134,4 +141,45 @@ const deleteAccountController = async (
   }
 };
 
-export { getPublicProfileController, updateProfileController, changePasswordController, deleteAccountController };
+// GET /api/v1/users/:id/contact - Obtener telefono del anunciante si el solicitante esta verificado
+const getContactController = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<Response> => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: 'Usuario no autenticado.',
+      });
+    }
+
+    const id = req.params.id as string;
+
+    if (!id) {
+      return res.status(400).json({
+        message: 'El ID del usuario es obligatorio.',
+      });
+    }
+
+    const contact = await getVerifiedContact(id, req.user.is_verified);
+
+    return res.status(200).json({
+      message: 'Contacto obtenido exitosamente.',
+      data: contact,
+    });
+  } catch (error: unknown) {
+    if (error instanceof UserServiceError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+
+    return res.status(500).json({ message: 'Error al obtener el contacto.' });
+  }
+};
+
+export {
+  getPublicProfileController,
+  updateProfileController,
+  changePasswordController,
+  deleteAccountController,
+  getContactController,
+};

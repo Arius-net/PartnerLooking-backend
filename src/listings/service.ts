@@ -1,5 +1,13 @@
 import { queryOne } from '../config/db';
-import { createListing, getAllListings, type CreateListingInput, type ListingRecord } from './repository';
+import {
+  createListing,
+  getAllListings,
+  getNearbyListings,
+  type CreateListingInput,
+  type ListingRecord,
+  type NearbyListingRecord,
+  type NearbyListingsFilter,
+} from './repository';
 
 export class ListingsServiceError extends Error {
   public readonly statusCode: number;
@@ -45,4 +53,14 @@ const fetchAllListings = async (filters?: {
   return getAllListings(filters);
 };
 
-export { createNewListing, fetchAllListings };
+const fetchNearbyListings = async (
+  filters: NearbyListingsFilter
+): Promise<NearbyListingRecord[]> => {
+  if (filters.radio_km <= 0) {
+    throw new ListingsServiceError('radio_km debe ser mayor a 0.', 400);
+  }
+
+  return getNearbyListings(filters);
+};
+
+export { createNewListing, fetchAllListings, fetchNearbyListings };
