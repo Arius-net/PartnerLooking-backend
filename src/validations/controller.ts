@@ -1,6 +1,6 @@
 import type { NextFunction, Response } from 'express';
 import type { AuthenticatedRequest } from '../middlewares/auth.middleware';
-import { ValidationServiceError, uploadValidationDocument } from './service';
+import { ValidationServiceError, uploadValidationDocument, updateVerificationStatusService } from './service';
 
 const uploadValidationController = async (
   req: AuthenticatedRequest,
@@ -31,4 +31,43 @@ const uploadValidationController = async (
   }
 };
 
-export { uploadValidationController };
+const updateVerificationStatusController = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const verificationId = typeof req.params.verificationId === 'string' ? req.params.verificationId : '';
+    const { estado } = req.body;
+
+    if (!verificationId) {
+      return res.status(400).json({
+        message: 'ID de verificacion requerido.',
+      });
+    }
+
+    if (!estado) {
+      return res.status(400).json({
+        message: 'Estado requerido (PENDING, VALID, REJECTED).',
+      });
+    }
+
+    const verification = await updateVerificationStatusService(
+      verificationId,
+      estado
+    );
+
+    return res.status(200).json({
+      message: 'Estado de verificacion actualizado.',
+      verification,
+    });
+  } catch (error: unknown) {
+    if (error instanceof ValidationServiceError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+
+    return next(error);
+  }
+};
+
+export { uploadValidationController, updateVerificationStatusController };

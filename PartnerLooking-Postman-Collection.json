@@ -1,0 +1,405 @@
+{
+  "info": {
+    "_postman_id": "partnerlooking-backend-collection",
+    "name": "PartnerLooking Backend",
+    "description": "Colección completa de endpoints del backend PartnerLooking",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreCompleto\": \"Juan Perez\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Public Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/USER_ID",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "USER_ID"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"+1234567890\",\n  \"universidad\": \"MIT\",\n  \"sobre_mi\": \"Soy estudiante de ingeniería\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"password123\",\n  \"newPassword\": \"newpassword456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/config/password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "config", "password"]
+            }
+          }
+        },
+        {
+          "name": "Get Verified Contact",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/USER_ID/contact",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "USER_ID", "contact"]
+            }
+          }
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/config/account",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "config", "account"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Listings",
+      "item": [
+        {
+          "name": "Get All Listings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/listings?tipo=cuarto&ciudad=CDMX&limite=10&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "listings"],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "cuarto",
+                  "disabled": true
+                },
+                {
+                  "key": "ciudad",
+                  "value": "CDMX",
+                  "disabled": true
+                },
+                {
+                  "key": "limite",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Listing",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoPublicacion\": \"busco_cuarto\",\n  \"tipoEspacio\": \"departamento\",\n  \"titulo\": \"Cuarto disponible en departamento\",\n  \"descripcion\": \"Cuarto amplio con ventana\",\n  \"direccion\": \"Calle 5 #123\",\n  \"ciudad\": \"CDMX\",\n  \"colonia\": \"Roma\",\n  \"precio\": 500,\n  \"disponibleDesde\": \"2026-05-01\",\n  \"latitud\": 19.4326,\n  \"longitud\": -99.1332,\n  \"amenidades\": {\"wifi\": true, \"cocina\": true},\n  \"permitemascotas\": false,\n  \"permiteFumar\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/listings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "listings"]
+            }
+          }
+        },
+        {
+          "name": "Get Nearby Listings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/listings/nearby?latitud=19.4326&longitud=-99.1332&radio_km=5&limite=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "listings", "nearby"],
+              "query": [
+                {
+                  "key": "latitud",
+                  "value": "19.4326"
+                },
+                {
+                  "key": "longitud",
+                  "value": "-99.1332"
+                },
+                {
+                  "key": "radio_km",
+                  "value": "5"
+                },
+                {
+                  "key": "limite",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Validations",
+      "item": [
+        {
+          "name": "Upload Validation Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "documento",
+                  "type": "file",
+                  "src": "/path/to/your/document.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/validations/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "validations", "upload"]
+            }
+          }
+        },
+        {
+          "name": "Update Verification Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"VALID\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/validations/VERIFICATION_ID/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "validations", "VERIFICATION_ID", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Favorites",
+      "item": [
+        {
+          "name": "Add to Favorites",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/favorites/LISTING_ID",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "favorites", "LISTING_ID"]
+            }
+          }
+        },
+        {
+          "name": "Remove from Favorites",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/favorites/LISTING_ID",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "favorites", "LISTING_ID"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"calificacion\": 5,\n  \"comentario\": \"Excelente compañero de cuarto, muy responsable\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/reviews/USER_ID",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "reviews", "USER_ID"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://partnerlooking-backend.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "YOUR_JWT_TOKEN_HERE",
+      "type": "string"
+    }
+  ]
+}

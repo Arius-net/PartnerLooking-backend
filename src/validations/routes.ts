@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { authMiddleware } from '../middlewares/auth.middleware';
-import { uploadValidationController } from './controller';
+import { uploadValidationController, updateVerificationStatusController } from './controller';
 
 const validationsRouter = Router();
 
@@ -17,6 +17,12 @@ validationsRouter.post(
   authMiddleware,
   upload.single('documento'),
   uploadValidationController
+);
+
+validationsRouter.put(
+  '/:verificationId/status',
+  authMiddleware,
+  updateVerificationStatusController
 );
 
 export { validationsRouter };

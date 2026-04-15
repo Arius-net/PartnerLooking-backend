@@ -27,4 +27,24 @@ const createVerification = async (
   return verification;
 };
 
-export { createVerification };
+const updateVerificationStatus = async (
+  verificationId: string,
+  newStatus: 'PENDING' | 'VALID' | 'REJECTED'
+): Promise<VerificationRecord> => {
+  const sql = `
+    UPDATE verificaciones
+    SET estado = $1, updated_at = CURRENT_TIMESTAMP
+    WHERE id = $2
+    RETURNING id, usuario_id, url_documento, estado, created_at
+  `;
+
+  const verification = await queryOne<VerificationRecord>(sql, [newStatus, verificationId]);
+
+  if (!verification) {
+    throw new Error('Verificacion no encontrada.');
+  }
+
+  return verification;
+};
+
+export { createVerification, updateVerificationStatus };

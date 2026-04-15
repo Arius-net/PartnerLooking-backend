@@ -1,5 +1,5 @@
 import { uploadBufferToCloudinary } from '../config/cloudinary';
-import { createVerification, type VerificationRecord } from './repository';
+import { createVerification, updateVerificationStatus, type VerificationRecord } from './repository';
 
 export class ValidationServiceError extends Error {
   public readonly statusCode: number;
@@ -31,4 +31,18 @@ const uploadValidationDocument = async (
   return createVerification(usuarioId, documentUrl);
 };
 
-export { uploadValidationDocument };
+const updateVerificationStatusService = async (
+  verificationId: string,
+  newStatus: 'PENDING' | 'VALID' | 'REJECTED'
+): Promise<VerificationRecord> => {
+  if (!['PENDING', 'VALID', 'REJECTED'].includes(newStatus)) {
+    throw new ValidationServiceError(
+      'Estado invalido. Debe ser: PENDING, VALID o REJECTED.',
+      400
+    );
+  }
+
+  return updateVerificationStatus(verificationId, newStatus);
+};
+
+export { uploadValidationDocument, updateVerificationStatusService };
