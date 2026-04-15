@@ -36,7 +36,7 @@ const uploadBufferToCloudinary = async (
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder,
-        resource_type: 'image',
+        resource_type: 'auto',
       },
       (error, result) => {
         if (error || !result?.secure_url) {
